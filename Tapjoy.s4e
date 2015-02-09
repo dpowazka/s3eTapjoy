@@ -1,0 +1,10 @@
+#include <s3eTypes.h>
+
+functions:
+s3eResult tapjoy_init(const char* app_id, const char* secret_key) S3E_RESULT_ERROR run_on_os_thread
+s3eResult tapjoy_on_pause() S3E_RESULT_ERROR run_on_os_thread
+s3eResult tapjoy_show_offers() S3E_RESULT_ERROR run_on_os_thread
+s3eResult tapjoy_show_fullscreen_ad() S3E_RESULT_ERROR run_on_os_thread
+int tapjoy_get_tap_points() run_on_os_thread
+int tapjoy_update_tap_points() S3E_RESULT_ERROR run_on_os_thread
+
