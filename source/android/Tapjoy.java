@@ -40,7 +40,7 @@ class Tapjoy
 		
     public int tapjoy_init(String app_id, String secret_key)
     {
-		settings = LoaderActivity.m_Activity.getSharedPreferences("com.warlings", 0);
+		settings = LoaderActivity.m_Activity.getSharedPreferences("com.warlings3", 0);
 		tap_points = settings.getInt(TAP_POINTS_KEY, 0);
 		
 		final TapjoyEarnedPointsNotifier earned_points_notifier = new TapjoyEarnedPointsNotifier() {

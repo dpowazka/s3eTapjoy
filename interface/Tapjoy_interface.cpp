@@ -11,36 +11,17 @@
 #include "Tapjoy.h"
 
 
+// Define S3E_EXT_SKIP_LOADER_CALL_LOCK on the user-side to skip LoaderCallStart/LoaderCallDone()-entry.
+// e.g. in s3eNUI this is used for generic user-side IwUI-based implementation.
 #ifndef S3E_EXT_SKIP_LOADER_CALL_LOCK
-// For MIPs (and WP8) platform we do not have asm code for stack switching
-// implemented. So we make LoaderCallStart call manually to set GlobalLock
-#if defined __mips || defined S3E_ANDROID_X86 || (defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP))
+#if defined I3D_ARCH_MIPS || defined S3E_ANDROID_X86 || (defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)) || defined I3D_ARCH_NACLX86_64
+// For platforms missing stack-switching (MIPS, WP8, Android-x86, NaCl, etc.) make loader-entry via LoaderCallStart/LoaderCallDone() on the user-side.
 #define LOADER_CALL_LOCK
 #endif
 #endif
 
-/**
- * Definitions for functions types passed to/from s3eExt interface
- */
-typedef  s3eResult(*tapjoy_init_t)(const char* app_id, const char* secret_key);
-typedef  s3eResult(*tapjoy_on_pause_t)();
-typedef  s3eResult(*tapjoy_show_offers_t)();
-typedef  s3eResult(*tapjoy_show_fullscreen_ad_t)();
-typedef        int(*tapjoy_get_tap_points_t)();
-typedef        int(*tapjoy_update_tap_points_t)();
 
-/**
- * struct that gets filled in by TapjoyRegister
- */
-typedef struct TapjoyFuncs
-{
-    tapjoy_init_t m_tapjoy_init;
-    tapjoy_on_pause_t m_tapjoy_on_pause;
-    tapjoy_show_offers_t m_tapjoy_show_offers;
-    tapjoy_show_fullscreen_ad_t m_tapjoy_show_fullscreen_ad;
-    tapjoy_get_tap_points_t m_tapjoy_get_tap_points;
-    tapjoy_update_tap_points_t m_tapjoy_update_tap_points;
-} TapjoyFuncs;
+#include "Tapjoy_interface.h"
 
 static TapjoyFuncs g_Ext;
 static bool g_GotExt = false;
@@ -93,13 +74,13 @@ s3eResult tapjoy_init(const char* app_id, const char* secret_key)
         return S3E_RESULT_ERROR;
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallStart(S3E_TRUE, (void*)g_Ext.m_tapjoy_init);
 #endif
 
     s3eResult ret = g_Ext.m_tapjoy_init(app_id, secret_key);
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallDone(S3E_TRUE, (void*)g_Ext.m_tapjoy_init);
 #endif
 
     return ret;
@@ -113,13 +94,13 @@ s3eResult tapjoy_on_pause()
         return S3E_RESULT_ERROR;
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallStart(S3E_TRUE, (void*)g_Ext.m_tapjoy_on_pause);
 #endif
 
     s3eResult ret = g_Ext.m_tapjoy_on_pause();
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallDone(S3E_TRUE, (void*)g_Ext.m_tapjoy_on_pause);
 #endif
 
     return ret;
@@ -133,13 +114,13 @@ s3eResult tapjoy_show_offers()
         return S3E_RESULT_ERROR;
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallStart(S3E_TRUE, (void*)g_Ext.m_tapjoy_show_offers);
 #endif
 
     s3eResult ret = g_Ext.m_tapjoy_show_offers();
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallDone(S3E_TRUE, (void*)g_Ext.m_tapjoy_show_offers);
 #endif
 
     return ret;
@@ -153,13 +134,13 @@ s3eResult tapjoy_show_fullscreen_ad()
         return S3E_RESULT_ERROR;
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallStart(S3E_TRUE, (void*)g_Ext.m_tapjoy_show_fullscreen_ad);
 #endif
 
     s3eResult ret = g_Ext.m_tapjoy_show_fullscreen_ad();
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallDone(S3E_TRUE, (void*)g_Ext.m_tapjoy_show_fullscreen_ad);
 #endif
 
     return ret;
@@ -173,13 +154,13 @@ int tapjoy_get_tap_points()
         return 0;
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallStart(S3E_TRUE, (void*)g_Ext.m_tapjoy_get_tap_points);
 #endif
 
     int ret = g_Ext.m_tapjoy_get_tap_points();
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallDone(S3E_TRUE, (void*)g_Ext.m_tapjoy_get_tap_points);
 #endif
 
     return ret;
@@ -193,13 +174,13 @@ int tapjoy_update_tap_points()
         return S3E_RESULT_ERROR;
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallStart(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallStart(S3E_TRUE, (void*)g_Ext.m_tapjoy_update_tap_points);
 #endif
 
     int ret = g_Ext.m_tapjoy_update_tap_points();
 
 #ifdef LOADER_CALL_LOCK
-    s3eDeviceLoaderCallDone(S3E_TRUE, NULL);
+    s3eDeviceLoaderCallDone(S3E_TRUE, (void*)g_Ext.m_tapjoy_update_tap_points);
 #endif
 
     return ret;

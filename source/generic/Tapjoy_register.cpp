@@ -61,11 +61,17 @@ static int tapjoy_update_tap_points_wrap()
 }
 
 #define tapjoy_init tapjoy_init_wrap
+
 #define tapjoy_on_pause tapjoy_on_pause_wrap
+
 #define tapjoy_show_offers tapjoy_show_offers_wrap
+
 #define tapjoy_show_fullscreen_ad tapjoy_show_fullscreen_ad_wrap
+
 #define tapjoy_get_tap_points tapjoy_get_tap_points_wrap
+
 #define tapjoy_update_tap_points tapjoy_update_tap_points_wrap
+
 
 #endif
 
@@ -88,7 +94,7 @@ void TapjoyRegisterExt()
     /*
      * Register the extension
      */
-    s3eEdkRegister("Tapjoy", funcPtrs, sizeof(funcPtrs), flags, TapjoyInit, TapjoyTerminate, 0);
+s3eEdkRegister("Tapjoy", funcPtrs, sizeof(funcPtrs), flags, TapjoyInit, TapjoyTerminate, 0);
 }
 
 #if !defined S3E_BUILD_S3ELOADER

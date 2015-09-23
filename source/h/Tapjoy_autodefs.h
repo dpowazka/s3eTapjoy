@@ -11,4 +11,12 @@
 #define S3E_EXT_TAPJOY_NAME "Tapjoy"
 #define S3E_EXT_TAPJOY_HASH 0x1d8ff2bc
 
+#ifdef S3E_EXT_REGISTER
+#ifndef S3E_EXT_REGISTER_KEY
+#define S3E_EXT_REGISTER_KEY(name, num, key) S3E_EXT_REGISTER(name, num)
+#endif
+S3E_EXT_REGISTER("Tapjoy", 6)
+#else
+
+#endif /* S3E_EXT_REGISTER */
 #endif /* !TAPJOY_AUTODEFS_H */
